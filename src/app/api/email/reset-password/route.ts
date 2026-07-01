@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
   try {
     const { email } = await req.json();
     await resend.emails.send({
-      from: 'TrendyTrades Security <no-reply@trendytrade.net>',
+      from: 'TrendyTrades Security <no-reply@trendy-trd.com>',
       to: email,
       subject: '🔒 Reset Your TrendyTrades Password',
       html: `

@@ -26,7 +26,7 @@ export async function POST(req: NextRequest) {
 
     // Send OTP email via Resend
     await resend.emails.send({
-      from: 'TrendyTrades Security <no-reply@trendytrade.net>',
+      from: 'TrendyTrades Security <no-reply@trendy-trd.com>',
       to: email,
       subject: 'Your TrendyTrades Login Code',
       html: `

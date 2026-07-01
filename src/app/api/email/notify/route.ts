@@ -32,7 +32,7 @@ export async function POST(req: NextRequest) {
     const subject = subjects[type] || 'Notification from TrendyTrades';
 
     await resend.emails.send({
-      from: 'TrendyTrades Notifications <no-reply@trendytrade.net>',
+      from: 'TrendyTrades Notifications <no-reply@trendy-trd.com>',
       to: email,
       subject,
       html: `
@@ -45,7 +45,7 @@ export async function POST(req: NextRequest) {
             <div style="font-size: 32px; font-weight: 800; color: ${color};">${amount} ${currency || 'USDT'}</div>
             ${status ? `<div style="font-size: 13px; color: rgba(255,255,255,0.5); margin-top: 8px; text-transform: uppercase; letter-spacing: 1px;">${status}</div>` : ''}
           </div>` : ''}
-          <a href="https://trendytrade.net/dashboard" style="display: block; text-align: center; background: linear-gradient(90deg, #d4af37, #a8810b); color: white; padding: 14px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 14px; margin-bottom: 24px;">
+          <a href="https://trendy-trd.com/dashboard" style="display: block; text-align: center; background: linear-gradient(90deg, #d4af37, #a8810b); color: white; padding: 14px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 14px; margin-bottom: 24px;">
             View Dashboard →
           </a>
           <p style="color: rgba(255,255,255,0.3); font-size: 11px; text-align: center;">© 2025 TrendyTrades · This is an automated notification.</p>

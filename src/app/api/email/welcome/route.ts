@@ -7,7 +7,7 @@ export async function POST(req: NextRequest) {
   try {
     const { email, name } = await req.json();
     await resend.emails.send({
-      from: 'TrendyTrades <welcome@trendytrade.net>',
+      from: 'TrendyTrades <welcome@trendy-trd.com>',
       to: email,
       subject: '🚀 Welcome to TrendyTrades — Start Growing Your Wealth',
       html: `
@@ -25,7 +25,7 @@ export async function POST(req: NextRequest) {
             <p style="font-size: 14px; color: rgba(255,255,255,0.7); margin-bottom: 8px;">💰 2. Make your first deposit in crypto</p>
             <p style="font-size: 14px; color: rgba(255,255,255,0.7);">📈 3. Choose an investment plan and start earning</p>
           </div>
-          <a href="https://trendytrade.net/auth/login" style="display: block; text-align: center; background: linear-gradient(90deg, #d4af37, #a8810b); color: white; padding: 16px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 15px; margin-bottom: 24px;">
+          <a href="https://trendy-trd.com/auth/login" style="display: block; text-align: center; background: linear-gradient(90deg, #d4af37, #a8810b); color: white; padding: 16px; border-radius: 10px; text-decoration: none; font-weight: 700; font-size: 15px; margin-bottom: 24px;">
             Access Your Dashboard →
           </a>
           <p style="color: rgba(255,255,255,0.3); font-size: 12px; text-align: center;">© 2025 TrendyTrades. All rights reserved.</p>
