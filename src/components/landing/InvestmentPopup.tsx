@@ -10,7 +10,8 @@ const NAMES = [
   'Fatima A.', 'Lucas P.', 'Emma D.', 'Mohamed H.', 'Chloe N.',
 ];
 
-const USA_STATES = [
+const LOCATIONS = [
+  // 🇺🇸 USA — all 50 states
   '🇺🇸 Alabama, USA', '🇺🇸 Alaska, USA', '🇺🇸 Arizona, USA', '🇺🇸 Arkansas, USA',
   '🇺🇸 California, USA', '🇺🇸 Colorado, USA', '🇺🇸 Connecticut, USA', '🇺🇸 Delaware, USA',
   '🇺🇸 Florida, USA', '🇺🇸 Georgia, USA', '🇺🇸 Hawaii, USA', '🇺🇸 Idaho, USA',
@@ -24,6 +25,12 @@ const USA_STATES = [
   '🇺🇸 South Dakota, USA', '🇺🇸 Tennessee, USA', '🇺🇸 Texas, USA', '🇺🇸 Utah, USA',
   '🇺🇸 Vermont, USA', '🇺🇸 Virginia, USA', '🇺🇸 Washington, USA', '🇺🇸 West Virginia, USA',
   '🇺🇸 Wisconsin, USA', '🇺🇸 Wyoming, USA',
+  // 🇬🇧 United Kingdom
+  '🇬🇧 England, UK', '🇬🇧 Scotland, UK',
+  // 🇨🇦 Canada — provinces
+  '🇨🇦 Ontario, Canada', '🇨🇦 British Columbia, Canada', '🇨🇦 Alberta, Canada',
+  '🇨🇦 Quebec, Canada', '🇨🇦 Manitoba, Canada', '🇨🇦 Saskatchewan, Canada',
+  '🇨🇦 Nova Scotia, Canada', '🇨🇦 New Brunswick, Canada',
 ];
 
 const PLANS = ['Starter Plan', 'Growth Plan', 'Premium Plan', 'Elite Plan'];
@@ -42,7 +49,7 @@ function timeAgo(): string {
 type Notification = {
   id: number;
   name: string;
-  state: string;
+  location: string;
   plan: string;
   amount: number;
   time: string;
@@ -58,7 +65,7 @@ export default function InvestmentPopup() {
     const next: Notification = {
       id: Date.now(),
       name: randomFrom(NAMES),
-      state: randomFrom(USA_STATES),
+      location: randomFrom(LOCATIONS),
       plan: randomFrom(PLANS),
       amount: randomFrom(AMOUNTS),
       time: timeAgo(),
@@ -112,7 +119,7 @@ export default function InvestmentPopup() {
           <div className="flex-1 min-w-0">
             {/* Name & location */}
             <p className="text-white font-semibold text-sm leading-tight">{notif.name}</p>
-            <p className="text-white/40 text-xs">{notif.state}</p>
+            <p className="text-white/40 text-xs">{notif.location}</p>
 
             {/* Investment detail */}
             <p className="text-white/70 text-xs mt-1.5 leading-relaxed">

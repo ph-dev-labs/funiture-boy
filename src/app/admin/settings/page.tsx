@@ -29,16 +29,27 @@ const CURRENCIES = [
 
 const PLANS = ['Starter Plan', 'Growth Plan', 'Premium Plan', 'Elite Plan'];
 
-const USA_STATES = [
-  'Alabama', 'Alaska', 'Arizona', 'Arkansas', 'California', 'Colorado',
-  'Connecticut', 'Delaware', 'Florida', 'Georgia', 'Hawaii', 'Idaho',
-  'Illinois', 'Indiana', 'Iowa', 'Kansas', 'Kentucky', 'Louisiana',
-  'Maine', 'Maryland', 'Massachusetts', 'Michigan', 'Minnesota', 'Mississippi',
-  'Missouri', 'Montana', 'Nebraska', 'Nevada', 'New Hampshire', 'New Jersey',
-  'New Mexico', 'New York', 'North Carolina', 'North Dakota', 'Ohio', 'Oklahoma',
-  'Oregon', 'Pennsylvania', 'Rhode Island', 'South Carolina', 'South Dakota',
-  'Tennessee', 'Texas', 'Utah', 'Vermont', 'Virginia', 'Washington',
-  'West Virginia', 'Wisconsin', 'Wyoming',
+const LOCATIONS = [
+  // 🇺🇸 USA — all 50 states
+  'Alabama, USA', 'Alaska, USA', 'Arizona, USA', 'Arkansas, USA',
+  'California, USA', 'Colorado, USA', 'Connecticut, USA', 'Delaware, USA',
+  'Florida, USA', 'Georgia, USA', 'Hawaii, USA', 'Idaho, USA',
+  'Illinois, USA', 'Indiana, USA', 'Iowa, USA', 'Kansas, USA',
+  'Kentucky, USA', 'Louisiana, USA', 'Maine, USA', 'Maryland, USA',
+  'Massachusetts, USA', 'Michigan, USA', 'Minnesota, USA', 'Mississippi, USA',
+  'Missouri, USA', 'Montana, USA', 'Nebraska, USA', 'Nevada, USA',
+  'New Hampshire, USA', 'New Jersey, USA', 'New Mexico, USA', 'New York, USA',
+  'North Carolina, USA', 'North Dakota, USA', 'Ohio, USA', 'Oklahoma, USA',
+  'Oregon, USA', 'Pennsylvania, USA', 'Rhode Island, USA', 'South Carolina, USA',
+  'South Dakota, USA', 'Tennessee, USA', 'Texas, USA', 'Utah, USA',
+  'Vermont, USA', 'Virginia, USA', 'Washington, USA', 'West Virginia, USA',
+  'Wisconsin, USA', 'Wyoming, USA',
+  // 🇬🇧 United Kingdom
+  'England, UK', 'Scotland, UK',
+  // 🇨🇦 Canada — provinces
+  'Ontario, Canada', 'British Columbia, Canada', 'Alberta, Canada',
+  'Quebec, Canada', 'Manitoba, Canada', 'Saskatchewan, Canada',
+  'Nova Scotia, Canada', 'New Brunswick, Canada',
 ];
 
 // ── Types ──────────────────────────────────────────────────────────────────────
@@ -46,7 +57,7 @@ const USA_STATES = [
 type Testimonial = {
   id?: string;
   name: string;
-  state: string;
+  location: string;
   avatar: string;
   rating: number;
   text: string;
@@ -55,7 +66,7 @@ type Testimonial = {
 
 const EMPTY_TESTIMONIAL: Testimonial = {
   name: '',
-  state: 'California',
+  location: 'California, USA',
   avatar: '',
   rating: 5,
   text: '',
@@ -131,15 +142,27 @@ function TestimonialModal({
 
         {/* State */}
         <div>
-          <label className="block text-white/50 text-xs mb-1">State</label>
+          <label className="block text-white/50 text-xs mb-1">Location</label>
           <select
-            value={form.state}
-            onChange={(e) => setForm((f) => ({ ...f, state: e.target.value }))}
+            value={form.location}
+            onChange={(e) => setForm((f) => ({ ...f, location: e.target.value }))}
             className="w-full bg-black/40 border border-white/10 rounded-lg px-4 py-2.5 text-white text-sm outline-none focus:border-[#d4af37]/60 transition-colors appearance-none"
           >
-            {USA_STATES.map((s) => (
-              <option key={s} value={s} className="bg-[#0f1117]">{s}</option>
-            ))}
+            <optgroup label="🇺🇸 United States" className="bg-[#0f1117]">
+              {LOCATIONS.filter(l => l.endsWith(', USA')).map((s) => (
+                <option key={s} value={s} className="bg-[#0f1117]">{s}</option>
+              ))}
+            </optgroup>
+            <optgroup label="🇬🇧 United Kingdom" className="bg-[#0f1117]">
+              {LOCATIONS.filter(l => l.endsWith(', UK')).map((s) => (
+                <option key={s} value={s} className="bg-[#0f1117]">{s}</option>
+              ))}
+            </optgroup>
+            <optgroup label="🇨🇦 Canada" className="bg-[#0f1117]">
+              {LOCATIONS.filter(l => l.endsWith(', Canada')).map((s) => (
+                <option key={s} value={s} className="bg-[#0f1117]">{s}</option>
+              ))}
+            </optgroup>
           </select>
         </div>
 
@@ -260,8 +283,9 @@ export default function AdminSettingsPage() {
   const handleSaveTestimonial = async (t: Testimonial) => {
     try {
       const { id, ...data } = t;
+      const payload = { ...data };
       if (id) {
-        await updateDoc(doc(db, 'testimonials', id), { ...data, updatedAt: serverTimestamp() });
+        await updateDoc(doc(db, 'testimonials', id), { ...payload, updatedAt: serverTimestamp() });
         toast.success('Testimonial updated!');
       } else {
         await addDoc(collection(db, 'testimonials'), { ...data, createdAt: serverTimestamp() });
@@ -407,7 +431,7 @@ export default function AdminSettingsPage() {
                   <div className="flex-1 min-w-0">
                     <div className="flex items-center gap-2 flex-wrap">
                       <span className="text-white font-semibold text-sm">{t.name}</span>
-                      <span className="text-white/40 text-xs">🇺🇸 {t.state}, USA</span>
+                      <span className="text-white/40 text-xs">{t.location}</span>
                       <span className="text-xs px-2 py-0.5 rounded-full bg-[#d4af37]/10 text-[#d4af37] border border-[#d4af37]/20">
                         {t.plan}
                       </span>
