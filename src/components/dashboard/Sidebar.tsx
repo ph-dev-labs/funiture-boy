@@ -39,7 +39,7 @@ export default function Sidebar() {
       {/* Logo */}
       <div className="h-16 flex items-center px-6 border-b border-white/10">
           <Link href="/dashboard" className="flex items-center">
-            <img src="/logo.png" alt="TrendyTrades" className="h-10 w-auto object-contain" />
+            <img src="/logo.png" alt="TrendyTrades" className="h-16 w-auto object-contain" />
           </Link>
       </div>
 

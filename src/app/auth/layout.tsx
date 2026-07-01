@@ -20,7 +20,7 @@ export default function AuthLayout({ children }: { children: React.ReactNode }) 
       {/* Header */}
       <header className="relative z-10 p-6">
           <Link href="/" className="flex items-center">
-            <img src="/logo.png" alt="TrendyTrades" className="h-12 w-auto object-contain" />
+            <img src="/logo.png" alt="TrendyTrades" className="h-24 w-auto object-contain" />
           </Link>
       </header>
 
