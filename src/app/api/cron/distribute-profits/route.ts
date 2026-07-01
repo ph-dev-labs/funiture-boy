@@ -1,8 +1,8 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { collection, getDocs, doc, updateDoc, increment, addDoc, serverTimestamp, query, where } from 'firebase/firestore';
-import { db } from '@/lib/firebase';
+import { adminDb } from '@/lib/firebase-admin';
+import { FieldValue } from 'firebase-admin/firestore';
 
-// Daily profit rates per plan (percentage of balance per day)
+// Daily profit rates per plan (percentage of invested amount per day)
 const PLAN_RATES: Record<string, number> = {
   starter: 0.015,  // 1.5%
   growth: 0.025,   // 2.5%
@@ -11,60 +11,74 @@ const PLAN_RATES: Record<string, number> = {
 };
 
 export async function GET(req: NextRequest) {
+  // ── Auth guard — only Vercel cron (or a manual call with the secret) may trigger this
+  const authHeader = req.headers.get('authorization');
+  if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
+    return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+  }
+
   try {
-    // Verify cron secret to prevent unauthorized access
-    const authHeader = req.headers.get('authorization');
-    if (authHeader !== `Bearer ${process.env.CRON_SECRET}`) {
-      return NextResponse.json({ error: 'Unauthorized' }, { status: 401 });
+    // Fetch all active investments using Admin SDK (bypasses Firestore rules)
+    const investmentsSnap = await adminDb
+      .collection('investments')
+      .where('status', '==', 'active')
+      .get();
+
+    if (investmentsSnap.empty) {
+      return NextResponse.json({ success: true, processed: 0, message: 'No active investments.' });
     }
 
-    // Fetch all active investments
-    const investmentsSnap = await getDocs(
-      query(collection(db, 'investments'), where('status', '==', 'active'))
-    );
-
-    const results: { uid: string; profit: number }[] = [];
+    const results: { uid: string; plan: string; profit: number }[] = [];
+    const batch = adminDb.batch(); // Use a batch for atomic writes
 
     for (const investDoc of investmentsSnap.docs) {
       const inv = investDoc.data();
       const { uid, plan, amount } = inv;
+
+      if (!uid || !amount || amount <= 0) continue;
+
       const rate = PLAN_RATES[plan?.toLowerCase()] ?? 0.015;
       const dailyProfit = parseFloat((amount * rate).toFixed(2));
 
       if (dailyProfit <= 0) continue;
 
-      // Add profit to user balance
-      const userRef = doc(db, 'users', uid);
-      await updateDoc(userRef, {
-        tradingProfit: increment(dailyProfit),
-        balance: increment(dailyProfit),
-        lastProfitAt: serverTimestamp(),
+      // ── 1. Atomically increment balance and tradingProfit on the user doc
+      const userRef = adminDb.collection('users').doc(uid);
+      batch.update(userRef, {
+        tradingProfit: FieldValue.increment(dailyProfit),
+        balance: FieldValue.increment(dailyProfit),
+        lastProfitAt: FieldValue.serverTimestamp(),
       });
 
-      // Log transaction
-      await addDoc(collection(db, 'transactions'), {
+      // ── 2. Log a transaction record
+      const txRef = adminDb.collection('transactions').doc();
+      batch.set(txRef, {
         uid,
         type: 'profit',
         amount: dailyProfit,
         plan,
         description: `Daily ${plan} plan profit (${(rate * 100).toFixed(1)}%)`,
         status: 'completed',
-        createdAt: serverTimestamp(),
+        createdAt: FieldValue.serverTimestamp(),
       });
 
-      // Add in-app notification
-      await addDoc(collection(db, `users/${uid}/notifications`), {
+      // ── 3. In-app notification
+      const notifRef = adminDb.collection(`users/${uid}/notifications`).doc();
+      batch.set(notifRef, {
         title: 'Daily Profit Credited 📈',
         message: `$${dailyProfit.toFixed(2)} has been added to your account from your ${plan} plan.`,
         type: 'success',
         read: false,
-        createdAt: serverTimestamp(),
+        createdAt: FieldValue.serverTimestamp(),
       });
 
-
-
-      results.push({ uid, profit: dailyProfit });
+      results.push({ uid, plan, profit: dailyProfit });
     }
+
+    // Commit all writes atomically
+    await batch.commit();
+
+    console.log(`[cron] Profit distributed to ${results.length} investors.`);
 
     return NextResponse.json({
       success: true,
@@ -72,7 +86,8 @@ export async function GET(req: NextRequest) {
       results,
     });
   } catch (error: any) {
-    console.error('Cron profit error:', error);
+    console.error('[cron] Profit distribution error:', error);
     return NextResponse.json({ error: error.message }, { status: 500 });
   }
 }
+
