@@ -4,6 +4,7 @@ import './globals.css';
 import { Toaster } from 'react-hot-toast';
 import { ReactQueryProvider } from '@/providers/ReactQueryProvider';
 import { AuthProvider } from '@/providers/AuthProvider';
+import Script from 'next/script';
 
 const outfit = Outfit({
   subsets: ['latin'],
@@ -52,6 +53,21 @@ export default function RootLayout({
               }}
             />
             {children}
+            
+            {/* Smartsupp Live Chat script */}
+            <Script id="smartsupp-widget" strategy="afterInteractive" dangerouslySetInnerHTML={{
+              __html: `
+                var _smartsupp = _smartsupp || {};
+                _smartsupp.key = '8f554cd2eeddd6b3af57edeb43f6121744a56f2b';
+                window.smartsupp||(function(d) {
+                  var s,c,o=smartsupp=function(){ o._.push(arguments)};o._=[];
+                  s=d.getElementsByTagName('script')[0];c=d.createElement('script');
+                  c.type='text/javascript';c.charset='utf-8';c.async=true;
+                  c.src='https://www.smartsuppchat.com/loader.js?';s.parentNode.insertBefore(c,s);
+                })(document);
+              `
+            }} />
+            <noscript>Powered by <a href="https://www.smartsupp.com" target="_blank" rel="noopener noreferrer">Smartsupp</a></noscript>
           </AuthProvider>
         </ReactQueryProvider>
       </body>

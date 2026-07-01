@@ -1,5 +1,7 @@
 'use client';
 
+import { useEffect } from 'react';
+
 import Link from 'next/link';
 import { usePathname } from 'next/navigation';
 import DashboardIcon from '@mui/icons-material/Dashboard';
@@ -10,6 +12,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import CurrencyBitcoinIcon from '@mui/icons-material/CurrencyBitcoin';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import CloseIcon from '@mui/icons-material/Close';
 import { auth } from '@/lib/firebase';
 import { useAuthStore } from '@/store';
 import { useRouter } from 'next/navigation';
@@ -23,10 +26,19 @@ const navItems = [
   { href: '/dashboard/settings', label: 'Settings', Icon: SettingsIcon },
 ];
 
-export default function Sidebar() {
+interface SidebarProps {
+  isOpen?: boolean;
+  onClose?: () => void;
+}
+
+export default function Sidebar({ isOpen = false, onClose }: SidebarProps) {
   const pathname = usePathname();
   const router = useRouter();
   const { logout } = useAuthStore();
+
+  useEffect(() => {
+    if (onClose) onClose();
+  }, [pathname]);
 
   const handleLogout = async () => {
     await auth.signOut();
@@ -35,12 +47,18 @@ export default function Sidebar() {
   };
 
   return (
-    <aside className="w-64 flex-shrink-0 border-r border-white/10 bg-[#0a0b10] flex flex-col hidden lg:flex">
+    <aside className={`fixed inset-y-0 left-0 z-50 w-64 border-r border-white/10 bg-[#0a0b10] flex flex-col transform transition-transform duration-300 lg:relative lg:translate-x-0 ${isOpen ? 'translate-x-0' : '-translate-x-full'}`}>
       {/* Logo */}
-      <div className="h-16 flex items-center px-6 border-b border-white/10">
+      <div className="h-16 flex items-center justify-between px-6 border-b border-white/10">
           <Link href="/dashboard" className="flex items-center">
             <img src="/logo.png" alt="TrendyTrades" className="h-16 w-auto object-contain" />
           </Link>
+          <button 
+            onClick={onClose}
+            className="lg:hidden p-1 rounded-lg text-white/70 hover:text-white hover:bg-white/5"
+          >
+            <CloseIcon />
+          </button>
       </div>
 
       {/* Nav */}

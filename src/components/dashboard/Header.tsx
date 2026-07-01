@@ -17,7 +17,11 @@ type Notification = {
   createdAt: any;
 };
 
-export default function Header() {
+interface HeaderProps {
+  onMenuClick?: () => void;
+}
+
+export default function Header({ onMenuClick }: HeaderProps) {
   const { user } = useAuthStore();
   const [showNotifications, setShowNotifications] = useState(false);
   const [notifications, setNotifications] = useState<Notification[]>([]);
@@ -63,7 +67,7 @@ export default function Header() {
   return (
     <header className="h-16 flex-shrink-0 border-b border-white/10 bg-[#0a0b10] flex items-center justify-between px-4 lg:px-8 relative z-50">
       <div className="flex items-center gap-4 lg:hidden">
-        <button className="text-white/70 hover:text-white transition-colors">
+        <button onClick={onMenuClick} className="text-white/70 hover:text-white transition-colors">
           <MenuIcon />
         </button>
         <span className="font-bold text-white">TrendyTrades</span>

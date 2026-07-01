@@ -1,6 +1,6 @@
 'use client';
 
-import { useEffect } from 'react';
+import { useEffect, useState } from 'react';
 import { useRouter, usePathname } from 'next/navigation';
 import Link from 'next/link';
 import { useAuthStore } from '@/store';
@@ -16,6 +16,8 @@ import toast from 'react-hot-toast';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import GroupsIcon from '@mui/icons-material/Groups';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import MenuIcon from '@mui/icons-material/Menu';
+import CloseIcon from '@mui/icons-material/Close';
 
 const adminNav = [
   { href: '/admin', label: 'Overview', Icon: DashboardIcon },
@@ -32,6 +34,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
   const router = useRouter();
   const pathname = usePathname();
   const { user, isLoading, logout } = useAuthStore();
+  const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
+
+  // Close mobile menu on route change
+  useEffect(() => {
+    setIsMobileMenuOpen(false);
+  }, [pathname]);
 
   useEffect(() => {
     if (isLoading) return;
@@ -63,9 +71,17 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
 
   return (
     <div className="flex h-screen bg-[#0a0b10] overflow-hidden">
+      {/* Mobile Overlay */}
+      {isMobileMenuOpen && (
+        <div 
+          className="fixed inset-0 bg-black/60 z-40 lg:hidden backdrop-blur-sm"
+          onClick={() => setIsMobileMenuOpen(false)}
+        />
+      )}
+
       {/* Admin Sidebar */}
-      <aside className="w-64 flex-shrink-0 border-r border-[#ff0055]/20 bg-[#0a0b10] flex flex-col hidden lg:flex">
-        <div className="h-16 flex items-center px-6 border-b border-[#ff0055]/20">
+      <aside className={`fixed inset-y-0 left-0 z-50 w-64 border-r border-[#ff0055]/20 bg-[#0a0b10] flex flex-col transform transition-transform duration-300 lg:relative lg:translate-x-0 ${isMobileMenuOpen ? 'translate-x-0' : '-translate-x-full'}`}>
+        <div className="h-16 flex items-center justify-between px-6 border-b border-[#ff0055]/20">
           <Link href="/admin" className="flex items-center gap-2">
             <div className="w-8 h-8 rounded-lg bg-[#ff0055] flex items-center justify-center shadow-[0_0_15px_rgba(255,0,85,0.4)]">
               <SecurityIcon sx={{ color: 'white', fontSize: 18 }} />
@@ -74,6 +90,12 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
               Admin<span className="text-[#ff0055]">Panel</span>
             </span>
           </Link>
+          <button 
+            onClick={() => setIsMobileMenuOpen(false)}
+            className="lg:hidden p-1 rounded-lg text-white/70 hover:text-white hover:bg-white/5"
+          >
+            <CloseIcon />
+          </button>
         </div>
 
         <nav className="flex-1 p-4 space-y-1">
@@ -109,7 +131,16 @@ export default function AdminLayout({ children }: { children: React.ReactNode })
       {/* Main Content */}
       <div className="flex-1 flex flex-col min-w-0">
         <header className="h-16 flex-shrink-0 border-b border-[#ff0055]/20 bg-[#0a0b10] flex items-center justify-between px-4 lg:px-8">
-          <div className="font-semibold text-white/80 hidden lg:block">System Administration</div>
+          <div className="flex items-center gap-4">
+            <button 
+              onClick={() => setIsMobileMenuOpen(true)}
+              className="lg:hidden p-2 -ml-2 rounded-lg text-white/70 hover:text-white hover:bg-white/5"
+            >
+              <MenuIcon />
+            </button>
+            <div className="font-semibold text-white/80 hidden lg:block">System Administration</div>
+            <div className="font-semibold text-white/80 lg:hidden">Admin</div>
+          </div>
           <div className="flex items-center gap-3 pl-4">
             <div className="text-right">
               <div className="text-sm font-medium text-white">Administrator</div>
