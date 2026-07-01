@@ -78,8 +78,8 @@ export default function PlansPage() {
           {plans.map((plan) => (
             <div
               key={plan.id}
-              className={`glass-panel p-6 flex flex-col relative overflow-hidden transition-all duration-300 hover:scale-[1.02] ${plan.popular ? 'ring-1' : ''}`}
-              style={{ ...(plan.popular ? { ringColor: plan.color } : {}) }}
+              className={`glass-panel p-6 flex flex-col relative overflow-hidden transition-all duration-300 hover:scale-[1.02] ${plan.popular ? 'border-2' : ''}`}
+              style={{ ...(plan.popular ? { borderColor: plan.color } : {}) }}
             >
               {plan.popular && (
                 <div className="absolute top-0 right-0 px-3 py-1 text-xs font-bold text-white rounded-bl-xl" style={{ background: plan.color }}>

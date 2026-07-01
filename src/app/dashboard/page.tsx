@@ -438,7 +438,7 @@ export default function DashboardOverview() {
                 <Tooltip
                   contentStyle={{ backgroundColor: 'rgba(0,0,0,0.85)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
                   itemStyle={{ color: chartType === 'balance' ? '#d4af37' : '#00e676' }}
-                  formatter={(value: number) => [`$${value.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, chartType === 'balance' ? 'Balance' : 'Profit']}
+                  formatter={(value: any) => [`$${Number(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, chartType === 'balance' ? 'Balance' : 'Profit']}
                 />
                 <Area type="monotone" dataKey="value" stroke={chartType === 'balance' ? '#d4af37' : '#00e676'} strokeWidth={3} fillOpacity={1} fill="url(#colorValue)" dot={false} activeDot={{ r: 4, fill: chartType === 'balance' ? '#d4af37' : '#00e676' }} />
               </AreaChart>

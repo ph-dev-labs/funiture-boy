@@ -147,7 +147,7 @@ export default function InvestPage() {
             </div>
 
             <ul className="flex-1 space-y-3 mb-6">
-              {plan.features.map((f) => (
+              {plan.features.map((f: string) => (
                 <li key={f} className="flex items-start gap-2 text-xs text-white/70">
                   <CheckIcon sx={{ color: plan.color, fontSize: 14, marginTop: '2px' }} className="shrink-0" />
                   {f}
