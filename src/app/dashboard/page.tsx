@@ -6,8 +6,64 @@ import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
 import Link from 'next/link';
 import {
-  AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, Cell
+  AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer
 } from 'recharts';
+import { useRef } from 'react';
+
+// ── TradingView Candlestick Widget ────────────────────────────────
+function TradingViewWidget() {
+  const containerRef = useRef<HTMLDivElement>(null);
+
+  useEffect(() => {
+    const container = containerRef.current;
+    if (!container) return;
+
+    // Clear previous widget if re-mounting
+    container.innerHTML = '';
+
+    const widgetDiv = document.createElement('div');
+    widgetDiv.className = 'tradingview-widget-container__widget';
+    widgetDiv.style.height = '100%';
+    widgetDiv.style.width = '100%';
+    container.appendChild(widgetDiv);
+
+    const script = document.createElement('script');
+    script.src = 'https://s3.tradingview.com/external-embedding/embed-widget-advanced-chart.js';
+    script.type = 'text/javascript';
+    script.async = true;
+    script.innerHTML = JSON.stringify({
+      autosize: true,
+      symbol: 'BITSTAMP:BTCUSD',
+      interval: 'D',
+      timezone: 'Etc/UTC',
+      theme: 'dark',
+      style: '1',          // 1 = Candlesticks
+      locale: 'en',
+      backgroundColor: 'rgba(0, 0, 0, 0)',
+      gridColor: 'rgba(255, 255, 255, 0.04)',
+      hide_top_toolbar: false,
+      hide_legend: false,
+      save_image: false,
+      hide_side_toolbar: true,
+      allow_symbol_change: false,
+      support_host: 'https://www.tradingview.com',
+    });
+
+    container.appendChild(script);
+
+    return () => {
+      if (container) container.innerHTML = '';
+    };
+  }, []);
+
+  return (
+    <div
+      ref={containerRef}
+      className="tradingview-widget-container"
+      style={{ height: '100%', width: '100%' }}
+    />
+  );
+}
 import CallMadeIcon from '@mui/icons-material/CallMade';
 import CallReceivedIcon from '@mui/icons-material/CallReceived';
 import AccountBalanceWalletOutlinedIcon from '@mui/icons-material/AccountBalanceWalletOutlined';
@@ -449,12 +505,12 @@ export default function DashboardOverview() {
           </div>
         </div>
 
-        {/* BTC Bar Chart */}
-        <div className="glass-panel p-6 flex flex-col">
-          <div className="flex items-center justify-between mb-6">
+        {/* BTC TradingView Chart */}
+        <div className="glass-panel flex flex-col overflow-hidden" style={{ minHeight: 340 }}>
+          <div className="flex items-center justify-between px-6 pt-5 pb-3 border-b border-white/5">
             <div>
-              <h2 className="text-lg font-semibold text-white">BTC Live Price</h2>
-              <p className="text-white/40 text-xs mt-0.5">Bitcoin 7-day sparkline (Bar Chart)</p>
+              <h2 className="text-lg font-semibold text-white">BTC / USD</h2>
+              <p className="text-white/40 text-xs mt-0.5">Live candlestick chart · TradingView</p>
             </div>
             {cryptos.length > 0 && cryptos.find(c => c.symbol === 'BTC') && (() => {
               const btc = cryptos.find(c => c.symbol === 'BTC')!;
@@ -462,50 +518,15 @@ export default function DashboardOverview() {
               return (
                 <div className="text-right">
                   <div className="text-lg font-bold text-white">${btc.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
-                  <div className={`text-xs font-medium ${isUp ? 'text-[#00e676]' : 'text-[#ff1744]'}`}>
-                    {isUp ? '+' : ''}{btc.change.toFixed(2)}%
+                  <div className={`text-xs font-semibold ${isUp ? 'text-[#00e676]' : 'text-[#ff1744]'}`}>
+                    {isUp ? '▲' : '▼'} {isUp ? '+' : ''}{btc.change.toFixed(2)}%
                   </div>
                 </div>
               );
             })()}
           </div>
-          <div className="h-[250px] w-full flex-1">
-            {cryptos.length === 0 ? (
-              <div className="h-full flex flex-col items-center justify-center text-white/30 text-sm gap-2">
-                <div className="w-8 h-8 rounded-full border-2 border-white/20 border-t-[#f7931a] animate-spin mb-2" />
-                <span>Loading BTC Data...</span>
-              </div>
-            ) : (() => {
-              const btc = cryptos.find(c => c.symbol === 'BTC');
-              if (!btc || !btc.sparkline || btc.sparkline.length === 0) {
-                return (
-                  <div className="h-full flex flex-col items-center justify-center text-white/30 text-sm">
-                    No BTC data available
-                  </div>
-                );
-              }
-              return (
-                <ResponsiveContainer width="100%" height="100%">
-                  <BarChart data={btc.sparkline} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
-                    <Tooltip
-                      contentStyle={{ backgroundColor: 'rgba(0,0,0,0.85)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
-                      itemStyle={{ color: '#f7931a' }}
-                      formatter={(value: any) => [`$${Number(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 'Price']}
-                      labelFormatter={() => ''}
-                      cursor={{ fill: 'rgba(255,255,255,0.05)' }}
-                    />
-                    <Bar dataKey="v" radius={[2, 2, 0, 0]}>
-                      {btc.sparkline.map((entry, index) => {
-                        // Compare with previous entry to determine color, or default to main color
-                        const prev = index > 0 ? btc.sparkline[index - 1].v : entry.v;
-                        const color = entry.v >= prev ? '#00e676' : '#ff1744';
-                        return <Cell key={`cell-${index}`} fill={color} fillOpacity={0.8} />;
-                      })}
-                    </Bar>
-                  </BarChart>
-                </ResponsiveContainer>
-              );
-            })()}
+          <div className="flex-1 w-full" style={{ height: 300 }}>
+            <TradingViewWidget />
           </div>
         </div>
       </div>
