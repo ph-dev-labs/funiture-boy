@@ -1,5 +1,4 @@
 import { create } from 'zustand';
-import { persist } from 'zustand/middleware';
 
 // ---- Types ----
 
@@ -28,6 +27,10 @@ export interface Notification {
 }
 
 // ---- Auth Store ----
+// NOTE: Intentionally NOT persisted to localStorage.
+// Persisting auth data causes stale data from a previous user to appear before
+// Firebase resolves the new session. All state is sourced fresh from Firestore
+// on every session via AuthProvider.
 interface AuthState {
   user: UserProfile | null;
   firebaseUser: { uid: string; email: string | null } | null;
@@ -38,23 +41,16 @@ interface AuthState {
   logout: () => void;
 }
 
-export const useAuthStore = create<AuthState>()(
-  persist(
-    (set) => ({
-      user: null,
-      firebaseUser: null,
-      isLoading: true,
-      setUser: (user) => set({ user }),
-      setFirebaseUser: (fbUser) => set({ firebaseUser: fbUser }),
-      setLoading: (isLoading) => set({ isLoading }),
-      logout: () => set({ user: null, firebaseUser: null }),
-    }),
-    {
-      name: 'auth-storage',
-      partialize: (state) => ({ user: state.user, firebaseUser: state.firebaseUser }),
-    }
-  )
-);
+export const useAuthStore = create<AuthState>()((set) => ({
+  user: null,
+  firebaseUser: null,
+  isLoading: true,
+  setUser: (user) => set({ user }),
+  setFirebaseUser: (fbUser) => set({ firebaseUser: fbUser }),
+  setLoading: (isLoading) => set({ isLoading }),
+  // Atomically wipe both user and firebaseUser so no stale data remains
+  logout: () => set({ user: null, firebaseUser: null, isLoading: false }),
+}));
 
 // ---- UI Store ----
 interface UIState {

@@ -5,19 +5,32 @@ import { useRouter } from 'next/navigation';
 import { useAuthStore } from '@/store';
 import Sidebar from '@/components/dashboard/Sidebar';
 import Header from '@/components/dashboard/Header';
+import toast from 'react-hot-toast';
 
 export default function DashboardLayout({ children }: { children: React.ReactNode }) {
   const router = useRouter();
-  const { firebaseUser, isLoading } = useAuthStore();
+  const { user, isLoading } = useAuthStore();
   const [isMobileMenuOpen, setIsMobileMenuOpen] = useState(false);
 
   useEffect(() => {
-    if (!isLoading && !firebaseUser) {
-      router.replace('/auth/login');
-    }
-  }, [firebaseUser, isLoading, router]);
+    if (isLoading) return;
 
-  if (isLoading || !firebaseUser) {
+    // Not authenticated at all → login
+    if (!user) {
+      router.replace('/auth/login');
+      return;
+    }
+
+    // Admins must not see the user dashboard
+    if (user.role === 'admin') {
+      toast.error('Redirecting to admin panel.', { id: 'admin-redirect' });
+      router.replace('/admin');
+    }
+  }, [user, isLoading, router]);
+
+  // Show spinner while loading OR while user profile is resolving
+  // This prevents any flash of user content before the role is confirmed
+  if (isLoading || !user || user.role === 'admin') {
     return (
       <div className="min-h-screen bg-[#0a0b10] flex items-center justify-center">
         <div className="w-8 h-8 border-2 border-[#d4af37]/30 border-t-[#d4af37] rounded-full animate-spin" />
@@ -45,3 +58,4 @@ export default function DashboardLayout({ children }: { children: React.ReactNod
     </div>
   );
 }
+
