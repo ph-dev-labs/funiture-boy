@@ -96,7 +96,7 @@ export default function Header() {
                 className="fixed inset-0 z-40" 
                 onClick={() => setShowNotifications(false)} 
               />
-              <div className="absolute right-0 mt-2 w-80 glass-panel border border-white/10 rounded-xl shadow-2xl p-4 z-50 max-h-96 flex flex-col">
+              <div className="absolute right-0 mt-2 w-80 bg-[#12131a] border border-white/10 rounded-xl shadow-2xl p-4 z-50 max-h-96 flex flex-col">
                 <div className="flex items-center justify-between mb-3 shrink-0">
                   <h3 className="text-sm font-semibold text-white">Notifications ({unreadCount})</h3>
                   {unreadCount > 0 && (
