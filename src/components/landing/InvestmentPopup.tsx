@@ -10,7 +10,21 @@ const NAMES = [
   'Fatima A.', 'Lucas P.', 'Emma D.', 'Mohamed H.', 'Chloe N.',
 ];
 
-const COUNTRIES = ['🇺🇸 United States', '🇬🇧 United Kingdom', '🇦🇪 UAE', '🇨🇦 Canada', '🇩🇪 Germany', '🇸🇬 Singapore', '🇧🇷 Brazil', '🇦🇺 Australia', '🇮🇳 India', '🇫🇷 France', '🇯🇵 Japan', '🇳🇬 Nigeria'];
+const USA_STATES = [
+  '🇺🇸 Alabama, USA', '🇺🇸 Alaska, USA', '🇺🇸 Arizona, USA', '🇺🇸 Arkansas, USA',
+  '🇺🇸 California, USA', '🇺🇸 Colorado, USA', '🇺🇸 Connecticut, USA', '🇺🇸 Delaware, USA',
+  '🇺🇸 Florida, USA', '🇺🇸 Georgia, USA', '🇺🇸 Hawaii, USA', '🇺🇸 Idaho, USA',
+  '🇺🇸 Illinois, USA', '🇺🇸 Indiana, USA', '🇺🇸 Iowa, USA', '🇺🇸 Kansas, USA',
+  '🇺🇸 Kentucky, USA', '🇺🇸 Louisiana, USA', '🇺🇸 Maine, USA', '🇺🇸 Maryland, USA',
+  '🇺🇸 Massachusetts, USA', '🇺🇸 Michigan, USA', '🇺🇸 Minnesota, USA', '🇺🇸 Mississippi, USA',
+  '🇺🇸 Missouri, USA', '🇺🇸 Montana, USA', '🇺🇸 Nebraska, USA', '🇺🇸 Nevada, USA',
+  '🇺🇸 New Hampshire, USA', '🇺🇸 New Jersey, USA', '🇺🇸 New Mexico, USA', '🇺🇸 New York, USA',
+  '🇺🇸 North Carolina, USA', '🇺🇸 North Dakota, USA', '🇺🇸 Ohio, USA', '🇺🇸 Oklahoma, USA',
+  '🇺🇸 Oregon, USA', '🇺🇸 Pennsylvania, USA', '🇺🇸 Rhode Island, USA', '🇺🇸 South Carolina, USA',
+  '🇺🇸 South Dakota, USA', '🇺🇸 Tennessee, USA', '🇺🇸 Texas, USA', '🇺🇸 Utah, USA',
+  '🇺🇸 Vermont, USA', '🇺🇸 Virginia, USA', '🇺🇸 Washington, USA', '🇺🇸 West Virginia, USA',
+  '🇺🇸 Wisconsin, USA', '🇺🇸 Wyoming, USA',
+];
 
 const PLANS = ['Starter Plan', 'Growth Plan', 'Premium Plan', 'Elite Plan'];
 
@@ -28,7 +42,7 @@ function timeAgo(): string {
 type Notification = {
   id: number;
   name: string;
-  country: string;
+  state: string;
   plan: string;
   amount: number;
   time: string;
@@ -44,7 +58,7 @@ export default function InvestmentPopup() {
     const next: Notification = {
       id: Date.now(),
       name: randomFrom(NAMES),
-      country: randomFrom(COUNTRIES),
+      state: randomFrom(USA_STATES),
       plan: randomFrom(PLANS),
       amount: randomFrom(AMOUNTS),
       time: timeAgo(),
@@ -98,7 +112,7 @@ export default function InvestmentPopup() {
           <div className="flex-1 min-w-0">
             {/* Name & location */}
             <p className="text-white font-semibold text-sm leading-tight">{notif.name}</p>
-            <p className="text-white/40 text-xs">{notif.country}</p>
+            <p className="text-white/40 text-xs">{notif.state}</p>
 
             {/* Investment detail */}
             <p className="text-white/70 text-xs mt-1.5 leading-relaxed">

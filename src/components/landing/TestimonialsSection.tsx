@@ -4,7 +4,7 @@ import StarIcon from '@mui/icons-material/Star';
 const reviews = [
   {
     name: 'James R.',
-    country: '🇺🇸 USA',
+    country: '🇺🇸 Texas, USA',
     avatar: 'JR',
     rating: 5,
     text: 'Trendy Trades changed my financial life. My Growth plan has been returning 2.5% daily consistently for 6 months. Withdrawals are instant!',
@@ -12,23 +12,23 @@ const reviews = [
   },
   {
     name: 'Amara O.',
-    country: '🇳🇬 Nigeria',
+    country: '🇺🇸 California, USA',
     avatar: 'AO',
     rating: 5,
     text: 'The copy trading feature is a game changer. I set it up once and now earn passively every week. The customer support is world class.',
     plan: 'Premium Plan',
   },
   {
-    name: 'Li Wei',
-    country: '🇨🇳 China',
-    avatar: 'LW',
+    name: 'Marcus W.',
+    country: '🇺🇸 Florida, USA',
+    avatar: 'MW',
     rating: 5,
     text: "Started with the Starter plan, now I'm on Elite. The compound earnings are incredible. Best crypto platform I've ever used.",
     plan: 'Elite Plan',
   },
   {
     name: 'Sophie M.',
-    country: '🇫🇷 France',
+    country: '🇺🇸 New York, USA',
     avatar: 'SM',
     rating: 5,
     text: 'Very professional platform. Everything is transparent, withdrawals work smoothly, and the team is always available. Highly recommend!',
@@ -36,7 +36,7 @@ const reviews = [
   },
   {
     name: 'Carlos V.',
-    country: '🇧🇷 Brazil',
+    country: '🇺🇸 Arizona, USA',
     avatar: 'CV',
     rating: 5,
     text: 'The OTP security and 2FA gave me confidence to invest a large amount. My Elite plan has been performing beyond my expectations.',
@@ -44,7 +44,7 @@ const reviews = [
   },
   {
     name: 'Priya K.',
-    country: '🇮🇳 India',
+    country: '🇺🇸 Georgia, USA',
     avatar: 'PK',
     rating: 4,
     text: 'Excellent returns and the interface is so clean and easy to use. The daily profit emails keep me updated. Great overall experience!',
