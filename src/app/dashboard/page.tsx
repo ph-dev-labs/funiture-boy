@@ -6,7 +6,7 @@ import { db } from '@/lib/firebase';
 import { collection, query, where, getDocs, orderBy, limit } from 'firebase/firestore';
 import Link from 'next/link';
 import {
-  AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer
+  AreaChart, Area, XAxis, YAxis, Tooltip, ResponsiveContainer, BarChart, Bar, Cell
 } from 'recharts';
 import CallMadeIcon from '@mui/icons-material/CallMade';
 import CallReceivedIcon from '@mui/icons-material/CallReceived';
@@ -378,72 +378,135 @@ export default function DashboardOverview() {
         </div>
       </div>
 
-      {/* Portfolio Chart */}
-      <div className="glass-panel p-6">
-        <div className="flex items-center justify-between mb-6">
-          <div>
-            <h2 className="text-lg font-semibold text-white">Portfolio Performance</h2>
-            <p className="text-white/40 text-xs mt-0.5">Based on your confirmed transactions</p>
-          </div>
-          
-          <div className="flex items-center gap-3">
-            {/* Toggle */}
-            <div className="flex bg-black/40 rounded-lg p-1 border border-white/10">
-              <button 
-                onClick={() => setChartType('balance')}
-                className={`px-3 py-1 text-xs font-semibold rounded-md transition-colors ${chartType === 'balance' ? 'bg-[#d4af37] text-black' : 'text-white/50 hover:text-white'}`}
-              >
-                Balance
-              </button>
-              <button 
-                onClick={() => setChartType('profit')}
-                className={`px-3 py-1 text-xs font-semibold rounded-md transition-colors ${chartType === 'profit' ? 'bg-[#00e676] text-black' : 'text-white/50 hover:text-white'}`}
-              >
-                Profit
-              </button>
+      {/* Portfolio Chart & BTC Chart */}
+      <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">
+        {/* Portfolio Chart */}
+        <div className="glass-panel p-6">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-lg font-semibold text-white">Portfolio Performance</h2>
+              <p className="text-white/40 text-xs mt-0.5">Based on your confirmed transactions</p>
             </div>
             
-            {/* Stat Bubble */}
-            {(chartType === 'balance' ? chartData : profitChartData).length >= 2 ? (() => {
-              const activeData = chartType === 'balance' ? chartData : profitChartData;
-              const first = activeData[0].value;
-              const last = activeData[activeData.length - 1].value;
-              const pct = first === 0 ? (last > 0 ? 100 : 0) : (((last - first) / first) * 100);
-              const isUp = pct >= 0;
-              return (
-                <span className={`text-xs font-medium px-2 py-1 rounded-md ${isUp ? 'bg-[#00e676]/10 text-[#00e676]' : 'bg-[#ff1744]/10 text-[#ff1744]'}`}>
-                  {isUp ? '+' : ''}{pct.toFixed(1)}% Overall
-                </span>
-              );
-            })() : null}
+            <div className="flex items-center gap-3">
+              {/* Toggle */}
+              <div className="flex bg-black/40 rounded-lg p-1 border border-white/10">
+                <button 
+                  onClick={() => setChartType('balance')}
+                  className={`px-3 py-1 text-xs font-semibold rounded-md transition-colors ${chartType === 'balance' ? 'bg-[#d4af37] text-black' : 'text-white/50 hover:text-white'}`}
+                >
+                  Balance
+                </button>
+                <button 
+                  onClick={() => setChartType('profit')}
+                  className={`px-3 py-1 text-xs font-semibold rounded-md transition-colors ${chartType === 'profit' ? 'bg-[#00e676] text-black' : 'text-white/50 hover:text-white'}`}
+                >
+                  Profit
+                </button>
+              </div>
+              
+              {/* Stat Bubble */}
+              {(chartType === 'balance' ? chartData : profitChartData).length >= 2 ? (() => {
+                const activeData = chartType === 'balance' ? chartData : profitChartData;
+                const first = activeData[0].value;
+                const last = activeData[activeData.length - 1].value;
+                const pct = first === 0 ? (last > 0 ? 100 : 0) : (((last - first) / first) * 100);
+                const isUp = pct >= 0;
+                return (
+                  <span className={`text-xs font-medium px-2 py-1 rounded-md ${isUp ? 'bg-[#00e676]/10 text-[#00e676]' : 'bg-[#ff1744]/10 text-[#ff1744]'}`}>
+                    {isUp ? '+' : ''}{pct.toFixed(1)}% Overall
+                  </span>
+                );
+              })() : null}
+            </div>
+          </div>
+          <div className="h-[250px] w-full">
+            {(chartType === 'balance' ? chartData : profitChartData).length < 2 ? (
+              <div className="h-full flex flex-col items-center justify-center text-white/30 text-sm gap-2">
+                <ShowChartIcon sx={{ fontSize: 40, opacity: 0.3 }} />
+                <span>No transaction history yet</span>
+              </div>
+            ) : (
+              <ResponsiveContainer width="100%" height="100%">
+                <AreaChart data={chartType === 'balance' ? chartData : profitChartData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
+                  <defs>
+                    <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
+                      <stop offset="5%" stopColor={chartType === 'balance' ? '#d4af37' : '#00e676'} stopOpacity={0.3}/>
+                      <stop offset="95%" stopColor={chartType === 'balance' ? '#d4af37' : '#00e676'} stopOpacity={0}/>
+                    </linearGradient>
+                  </defs>
+                  <XAxis dataKey="date" stroke="#ffffff30" fontSize={11} tickLine={false} axisLine={false} />
+                  <YAxis stroke="#ffffff30" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(v) => `$${v.toLocaleString()}`} />
+                  <Tooltip
+                    contentStyle={{ backgroundColor: 'rgba(0,0,0,0.85)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
+                    itemStyle={{ color: chartType === 'balance' ? '#d4af37' : '#00e676' }}
+                    formatter={(value: any) => [`$${Number(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, chartType === 'balance' ? 'Balance' : 'Profit']}
+                  />
+                  <Area type="monotone" dataKey="value" stroke={chartType === 'balance' ? '#d4af37' : '#00e676'} strokeWidth={3} fillOpacity={1} fill="url(#colorValue)" dot={false} activeDot={{ r: 4, fill: chartType === 'balance' ? '#d4af37' : '#00e676' }} />
+                </AreaChart>
+              </ResponsiveContainer>
+            )}
           </div>
         </div>
-        <div className="h-[250px] w-full">
-          {(chartType === 'balance' ? chartData : profitChartData).length < 2 ? (
-            <div className="h-full flex flex-col items-center justify-center text-white/30 text-sm gap-2">
-              <ShowChartIcon sx={{ fontSize: 40, opacity: 0.3 }} />
-              <span>No transaction history yet</span>
+
+        {/* BTC Bar Chart */}
+        <div className="glass-panel p-6 flex flex-col">
+          <div className="flex items-center justify-between mb-6">
+            <div>
+              <h2 className="text-lg font-semibold text-white">BTC Live Price</h2>
+              <p className="text-white/40 text-xs mt-0.5">Bitcoin 7-day sparkline (Bar Chart)</p>
             </div>
-          ) : (
-            <ResponsiveContainer width="100%" height="100%">
-              <AreaChart data={chartType === 'balance' ? chartData : profitChartData} margin={{ top: 10, right: 0, left: -20, bottom: 0 }}>
-                <defs>
-                  <linearGradient id="colorValue" x1="0" y1="0" x2="0" y2="1">
-                    <stop offset="5%" stopColor={chartType === 'balance' ? '#d4af37' : '#00e676'} stopOpacity={0.3}/>
-                    <stop offset="95%" stopColor={chartType === 'balance' ? '#d4af37' : '#00e676'} stopOpacity={0}/>
-                  </linearGradient>
-                </defs>
-                <XAxis dataKey="date" stroke="#ffffff30" fontSize={11} tickLine={false} axisLine={false} />
-                <YAxis stroke="#ffffff30" fontSize={11} tickLine={false} axisLine={false} tickFormatter={(v) => `$${v.toLocaleString()}`} />
-                <Tooltip
-                  contentStyle={{ backgroundColor: 'rgba(0,0,0,0.85)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
-                  itemStyle={{ color: chartType === 'balance' ? '#d4af37' : '#00e676' }}
-                  formatter={(value: any) => [`$${Number(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, chartType === 'balance' ? 'Balance' : 'Profit']}
-                />
-                <Area type="monotone" dataKey="value" stroke={chartType === 'balance' ? '#d4af37' : '#00e676'} strokeWidth={3} fillOpacity={1} fill="url(#colorValue)" dot={false} activeDot={{ r: 4, fill: chartType === 'balance' ? '#d4af37' : '#00e676' }} />
-              </AreaChart>
-            </ResponsiveContainer>
-          )}
+            {cryptos.length > 0 && cryptos.find(c => c.symbol === 'BTC') && (() => {
+              const btc = cryptos.find(c => c.symbol === 'BTC')!;
+              const isUp = btc.change >= 0;
+              return (
+                <div className="text-right">
+                  <div className="text-lg font-bold text-white">${btc.price.toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</div>
+                  <div className={`text-xs font-medium ${isUp ? 'text-[#00e676]' : 'text-[#ff1744]'}`}>
+                    {isUp ? '+' : ''}{btc.change.toFixed(2)}%
+                  </div>
+                </div>
+              );
+            })()}
+          </div>
+          <div className="h-[250px] w-full flex-1">
+            {cryptos.length === 0 ? (
+              <div className="h-full flex flex-col items-center justify-center text-white/30 text-sm gap-2">
+                <div className="w-8 h-8 rounded-full border-2 border-white/20 border-t-[#f7931a] animate-spin mb-2" />
+                <span>Loading BTC Data...</span>
+              </div>
+            ) : (() => {
+              const btc = cryptos.find(c => c.symbol === 'BTC');
+              if (!btc || !btc.sparkline || btc.sparkline.length === 0) {
+                return (
+                  <div className="h-full flex flex-col items-center justify-center text-white/30 text-sm">
+                    No BTC data available
+                  </div>
+                );
+              }
+              return (
+                <ResponsiveContainer width="100%" height="100%">
+                  <BarChart data={btc.sparkline} margin={{ top: 10, right: 0, left: 0, bottom: 0 }}>
+                    <Tooltip
+                      contentStyle={{ backgroundColor: 'rgba(0,0,0,0.85)', border: '1px solid rgba(255,255,255,0.1)', borderRadius: '8px' }}
+                      itemStyle={{ color: '#f7931a' }}
+                      formatter={(value: any) => [`$${Number(value).toLocaleString(undefined, { minimumFractionDigits: 2, maximumFractionDigits: 2 })}`, 'Price']}
+                      labelFormatter={() => ''}
+                      cursor={{ fill: 'rgba(255,255,255,0.05)' }}
+                    />
+                    <Bar dataKey="v" radius={[2, 2, 0, 0]}>
+                      {btc.sparkline.map((entry, index) => {
+                        // Compare with previous entry to determine color, or default to main color
+                        const prev = index > 0 ? btc.sparkline[index - 1].v : entry.v;
+                        const color = entry.v >= prev ? '#00e676' : '#ff1744';
+                        return <Cell key={`cell-${index}`} fill={color} fillOpacity={0.8} />;
+                      })}
+                    </Bar>
+                  </BarChart>
+                </ResponsiveContainer>
+              );
+            })()}
+          </div>
         </div>
       </div>
 

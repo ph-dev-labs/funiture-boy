@@ -5,7 +5,6 @@ import { useRouter, useSearchParams } from 'next/navigation';
 import Link from 'next/link';
 import {
   createUserWithEmailAndPassword,
-  sendEmailVerification,
   updateProfile,
 } from 'firebase/auth';
 import { doc, setDoc, serverTimestamp } from 'firebase/firestore';
@@ -49,7 +48,13 @@ function RegisterForm() {
     try {
       const cred = await createUserWithEmailAndPassword(auth, form.email, form.password);
       await updateProfile(cred.user, { displayName: form.name });
-      await sendEmailVerification(cred.user);
+
+      // Send custom email verification via Resend
+      await fetch('/api/auth/send-verification', {
+        method: 'POST',
+        headers: { 'Content-Type': 'application/json' },
+        body: JSON.stringify({ email: form.email, name: form.name }),
+      });
 
       // Create Firestore user document
       await setDoc(doc(db, 'users', cred.user.uid), {
