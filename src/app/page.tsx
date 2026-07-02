@@ -13,7 +13,6 @@ export default function HomePage() {
       <StatsBar />
       <TestimonialsSection />
       <Footer />
-      {/* Social proof investment popup */}
       <InvestmentPopup />
     </main>
   );
