@@ -37,7 +37,8 @@ export async function GET(req: NextRequest) {
 
       if (!uid || !amount || amount <= 0) continue;
 
-      const rate = PLAN_RATES[plan?.toLowerCase()] ?? 0.015;
+      const safePlan = plan || 'Unknown';
+      const rate = PLAN_RATES[safePlan.toLowerCase()] ?? 0.015;
       const dailyProfit = parseFloat((amount * rate).toFixed(2));
 
       if (dailyProfit <= 0) continue;
@@ -56,8 +57,8 @@ export async function GET(req: NextRequest) {
         uid,
         type: 'profit',
         amount: dailyProfit,
-        plan,
-        description: `Daily ${plan} plan profit (${(rate * 100).toFixed(1)}%)`,
+        plan: safePlan,
+        description: `Daily ${safePlan} plan profit (${(rate * 100).toFixed(1)}%)`,
         status: 'completed',
         createdAt: FieldValue.serverTimestamp(),
       });
@@ -66,7 +67,7 @@ export async function GET(req: NextRequest) {
       const notifRef = adminDb.collection(`users/${uid}/notifications`).doc();
       batch.set(notifRef, {
         title: 'Daily Profit Credited 📈',
-        message: `$${dailyProfit.toFixed(2)} has been added to your account from your ${plan} plan.`,
+        message: `$${dailyProfit.toFixed(2)} has been added to your account from your ${safePlan} plan.`,
         type: 'success',
         read: false,
         createdAt: FieldValue.serverTimestamp(),
