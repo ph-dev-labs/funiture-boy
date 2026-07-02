@@ -192,8 +192,9 @@ export default function DashboardOverview() {
   const [chartData, setChartData] = useState<{ date: string; value: number }[]>([]);
   const [profitChartData, setProfitChartData] = useState<{ date: string; value: number }[]>([]);
   const [chartType, setChartType] = useState<'balance' | 'profit'>('balance');
+  const [investments, setInvestments] = useState<any[]>([]);
 
-  // ── Fetch recent transactions ──────────────────────────────────
+  // ── Fetch recent transactions & investments ──────────────────────────────────
   const fetchTx = useCallback(async () => {
     if (!user?.uid) return;
     setTxLoading(true);
@@ -228,6 +229,15 @@ export default function DashboardOverview() {
 
       results.sort((a, b) => (b.date?.seconds || 0) - (a.date?.seconds || 0));
       setTxList(results.slice(0, 6));
+      
+      // Fetch user's investments
+      const invQ = query(collection(db, 'investments'), where('uid', '==', user.uid), orderBy('createdAt', 'desc'));
+      const invSnap = await getDocs(invQ);
+      const invs: any[] = [];
+      invSnap.forEach(doc => {
+        invs.push({ id: doc.id, ...doc.data() });
+      });
+      setInvestments(invs);
     } catch (err) {
       console.error(err);
     } finally {
@@ -550,6 +560,64 @@ export default function DashboardOverview() {
           </div>
         )}
       </div>
+
+      {/* Active Investments */}
+      {investments.length > 0 && (
+        <div className="glass-panel p-6">
+          <div className="flex items-center justify-between mb-4">
+            <h2 className="text-lg font-semibold text-white">Your Investments</h2>
+          </div>
+          <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-4">
+            {investments.map(inv => {
+              const isCompleted = inv.status === 'completed';
+              const duration = inv.durationDays || 30;
+              
+              let daysRemaining = 0;
+              if (inv.endDate) {
+                const end = inv.endDate.seconds ? new Date(inv.endDate.seconds * 1000) : new Date(inv.endDate);
+                daysRemaining = Math.max(0, Math.ceil((end.getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
+              }
+              
+              return (
+                <div key={inv.id} className="bg-white/5 border border-white/10 p-4 rounded-xl relative overflow-hidden">
+                  <div className="flex justify-between items-start mb-3">
+                    <div>
+                      <div className="text-sm text-white/50 uppercase tracking-wider">{inv.plan} Plan</div>
+                      <div className="text-2xl font-bold text-white">${(inv.amount || 0).toLocaleString()}</div>
+                    </div>
+                    <div className={`px-2 py-1 rounded text-xs font-semibold ${isCompleted ? 'bg-white/10 text-white/50' : 'bg-[#00e676]/10 text-[#00e676]'}`}>
+                      {isCompleted ? 'Completed' : 'Running'}
+                    </div>
+                  </div>
+                  
+                  <div className="space-y-2 mt-4">
+                    <div className="flex justify-between text-sm">
+                      <span className="text-white/50">Daily ROI</span>
+                      <span className="text-[#00e676] font-semibold">{inv.dailyRoi}%</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-white/50">Duration</span>
+                      <span className="text-white font-medium">{duration} Days</span>
+                    </div>
+                    <div className="flex justify-between text-sm">
+                      <span className="text-white/50">Time Remaining</span>
+                      <span className="text-white font-medium">{isCompleted ? '0' : daysRemaining} Days</span>
+                    </div>
+                  </div>
+                  
+                  {/* Progress bar */}
+                  <div className="mt-4 h-1.5 w-full bg-white/10 rounded-full overflow-hidden">
+                    <div 
+                      className="h-full bg-gradient-to-r from-[#d4af37] to-[#a8810b]" 
+                      style={{ width: `${isCompleted ? 100 : Math.min(100, Math.max(0, ((duration - daysRemaining) / duration) * 100))}%` }}
+                    />
+                  </div>
+                </div>
+              );
+            })}
+          </div>
+        </div>
+      )}
 
       {/* Recent Transactions + Copy Trading */}
       <div className="grid grid-cols-1 lg:grid-cols-2 gap-6">

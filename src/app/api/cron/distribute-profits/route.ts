@@ -72,6 +72,14 @@ export async function GET(req: NextRequest) {
         createdAt: FieldValue.serverTimestamp(),
       });
 
+      // ── 4. Auto-expire if past end date
+      if (inv.endDate) {
+        const endDate = inv.endDate.toDate ? inv.endDate.toDate() : new Date(inv.endDate);
+        if (new Date() >= endDate) {
+          batch.update(investDoc.ref, { status: 'completed' });
+        }
+      }
+
       results.push({ uid, plan, profit: dailyProfit });
     }
 

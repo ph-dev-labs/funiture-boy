@@ -139,6 +139,10 @@ export default function AdminPlansPage() {
                   <label className="text-[10px] text-white/40 uppercase">Daily ROI (%)</label>
                   <input type="number" step="0.1" value={p.dailyRoi} onChange={e => updatePlan(p.id, 'dailyRoi', Number(e.target.value))} className="w-full bg-transparent border-b border-white/20 text-white text-sm outline-none py-1 focus:border-[#d4af37]" />
                 </div>
+                <div>
+                  <label className="text-[10px] text-white/40 uppercase">Duration (Days)</label>
+                  <input type="number" value={p.duration} onChange={e => updatePlan(p.id, 'duration', Number(e.target.value))} className="w-full bg-transparent border-b border-white/20 text-white text-sm outline-none py-1 focus:border-[#d4af37]" />
+                </div>
                 <div className="flex items-center mt-2 col-span-1">
                   <input type="checkbox" checked={p.popular} onChange={e => updatePlan(p.id, 'popular', e.target.checked)} className="mr-2" />
                   <label className="text-[10px] text-white/40 uppercase">Most Popular Ribbon</label>

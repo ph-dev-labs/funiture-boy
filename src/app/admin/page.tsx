@@ -3,9 +3,11 @@
 import { useEffect, useState } from 'react';
 import { collection, getCountFromServer } from 'firebase/firestore';
 import { db } from '@/lib/firebase';
+import toast from 'react-hot-toast';
 import PeopleIcon from '@mui/icons-material/People';
 import ReceiptLongIcon from '@mui/icons-material/ReceiptLong';
 import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
+import PlayArrowIcon from '@mui/icons-material/PlayArrow';
 
 import CallReceivedIcon from '@mui/icons-material/CallReceived';
 import CallMadeIcon from '@mui/icons-material/CallMade';
@@ -66,6 +68,28 @@ export default function AdminOverview() {
   const [loading, setLoading] = useState(true);
   const [txList, setTxList] = useState<Tx[]>([]);
   const [txLoading, setTxLoading] = useState(true);
+  const [runningCron, setRunningCron] = useState(false);
+
+  const handleRunCron = async () => {
+    if (confirm('Are you sure you want to distribute daily profits to all active investments now?')) {
+      setRunningCron(true);
+      try {
+        const res = await fetch('/api/admin/trigger-cron', { method: 'POST' });
+        const data = await res.json();
+        if (res.ok) {
+          toast.success(`Success! Distributed profits to ${data.processed} investments.`);
+          // Optionally refresh tx list
+          window.location.reload();
+        } else {
+          toast.error(data.error || 'Failed to distribute profits.');
+        }
+      } catch (err) {
+        toast.error('Failed to trigger cron');
+      } finally {
+        setRunningCron(false);
+      }
+    }
+  };
 
   useEffect(() => {
     async function fetchStats() {
@@ -138,9 +162,19 @@ export default function AdminOverview() {
 
   return (
     <div className="animate-fade-in space-y-6">
-      <div>
-        <h1 className="text-2xl font-bold text-white mb-1">System Overview</h1>
-        <p className="text-white/50 text-sm">High-level metrics for TrendyTrades platform.</p>
+      <div className="flex items-center justify-between">
+        <div>
+          <h1 className="text-2xl font-bold text-white mb-1">System Overview</h1>
+          <p className="text-white/50 text-sm">High-level metrics for TrendyTrades platform.</p>
+        </div>
+        <button
+          onClick={handleRunCron}
+          disabled={runningCron}
+          className="flex items-center gap-2 px-4 py-2 rounded-lg bg-[#00e676]/20 text-[#00e676] font-bold text-sm shadow-lg hover:bg-[#00e676]/30 transition-all disabled:opacity-50"
+        >
+          <PlayArrowIcon sx={{ fontSize: 18 }} />
+          {runningCron ? 'Running...' : 'Distribute Profits Now'}
+        </button>
       </div>
 
       <div className="grid grid-cols-1 md:grid-cols-3 gap-6">

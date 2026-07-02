@@ -58,6 +58,10 @@ export default function InvestPage() {
       });
 
       // 2. Create investment record
+      const durationDays = selectedPlan.duration || 30;
+      const endDate = new Date();
+      endDate.setDate(endDate.getDate() + durationDays);
+
       await addDoc(collection(db, 'investments'), {
         uid: user.uid,
         email: user.email,
@@ -65,6 +69,8 @@ export default function InvestPage() {
         plan: selectedPlan.name,
         amount: investAmount,
         dailyRoi: selectedPlan.dailyRoi,
+        durationDays,
+        endDate,
         status: 'active',
         createdAt: serverTimestamp(),
       });
