@@ -1,5 +1,5 @@
 import { NextRequest, NextResponse } from 'next/server';
-import { adminDb } from '@/lib/firebase-admin';
+import { adminDb } from '@/lib/firebase-admin-db';
 import { FieldValue } from 'firebase-admin/firestore';
 
 // Daily profit rates per plan (percentage of invested amount per day)
