@@ -16,7 +16,13 @@ export async function POST(req: NextRequest) {
       }
     });
 
-    const data = await response.json();
+    const text = await response.text();
+    let data;
+    try {
+      data = JSON.parse(text);
+    } catch (e) {
+      data = { error: 'Invalid JSON response from cron route', text };
+    }
 
     if (!response.ok) {
       return NextResponse.json({ error: 'Failed to trigger cron', details: data }, { status: response.status });
