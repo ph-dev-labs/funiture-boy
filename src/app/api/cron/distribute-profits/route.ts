@@ -37,6 +37,17 @@ export async function GET(req: NextRequest) {
 
       if (!uid || !amount || amount <= 0) continue;
 
+      // ── Skip if already paid in the last 20 hours
+      if (inv.lastPayoutAt) {
+        const lastPayout = inv.lastPayoutAt.toDate ? inv.lastPayoutAt.toDate() : new Date(inv.lastPayoutAt);
+        const diffMs = Date.now() - lastPayout.getTime();
+        const diffHours = diffMs / (1000 * 60 * 60);
+        if (diffHours < 20) {
+          console.log(`[cron] Skipping investment ${investDoc.id} - paid ${diffHours.toFixed(1)}h ago`);
+          continue;
+        }
+      }
+
       const safePlan = plan || 'Unknown';
       const rate = PLAN_RATES[safePlan.toLowerCase()] ?? 0.015;
       const dailyProfit = parseFloat((amount * rate).toFixed(2));
@@ -73,13 +84,19 @@ export async function GET(req: NextRequest) {
         createdAt: FieldValue.serverTimestamp(),
       });
 
-      // ── 4. Auto-expire if past end date
+      // ── 4. Update lastPayoutAt & Auto-expire if past end date
+      const updateData: Record<string, any> = {
+        lastPayoutAt: FieldValue.serverTimestamp(),
+      };
+
       if (inv.endDate) {
         const endDate = inv.endDate.toDate ? inv.endDate.toDate() : new Date(inv.endDate);
         if (new Date() >= endDate) {
-          batch.update(investDoc.ref, { status: 'completed' });
+          updateData.status = 'completed';
         }
       }
+
+      batch.update(investDoc.ref, updateData);
 
       results.push({ uid, plan, profit: dailyProfit });
     }

@@ -10,7 +10,7 @@ function getAdminApp(): App {
     credential: cert({
       projectId: process.env.FIREBASE_PROJECT_ID,
       clientEmail: process.env.FIREBASE_CLIENT_EMAIL,
-      privateKey: key?.replace(/\\n/g, '\n'),
+      privateKey: key?.replace(/^"|"$/g, '').replace(/\\n/g, '\n'),
     }),
   });
 }
