@@ -193,6 +193,7 @@ export default function DashboardOverview() {
   const [profitChartData, setProfitChartData] = useState<{ date: string; value: number }[]>([]);
   const [chartType, setChartType] = useState<'balance' | 'profit'>('balance');
   const [investments, setInvestments] = useState<any[]>([]);
+  const [now, setNow] = useState<number>(0);
 
   // ── Fetch recent transactions & investments ──────────────────────────────────
   const fetchTx = useCallback(async () => {
@@ -245,7 +246,10 @@ export default function DashboardOverview() {
     }
   }, [user?.uid, balance]);
 
-  useEffect(() => { fetchTx(); }, [fetchTx]);
+  useEffect(() => { 
+    setNow(Date.now());
+    fetchTx(); 
+  }, [fetchTx]);
 
   const fetchChartData = useCallback(async () => {
     if (!user?.uid) return;
@@ -575,7 +579,8 @@ export default function DashboardOverview() {
               let daysRemaining = 0;
               if (inv.endDate) {
                 const end = inv.endDate.seconds ? new Date(inv.endDate.seconds * 1000) : new Date(inv.endDate);
-                daysRemaining = Math.max(0, Math.ceil((end.getTime() - Date.now()) / (1000 * 60 * 60 * 24)));
+                const currentTime = now || 1700000000000;
+                daysRemaining = Math.max(0, Math.ceil((end.getTime() - currentTime) / (1000 * 60 * 60 * 24)));
               }
               
               return (

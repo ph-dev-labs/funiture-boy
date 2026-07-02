@@ -14,6 +14,7 @@ import VerifiedUserIcon from '@mui/icons-material/VerifiedUser';
 import { auth } from '@/lib/firebase';
 import toast from 'react-hot-toast';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
+import AccountBalanceIcon from '@mui/icons-material/AccountBalance';
 import GroupsIcon from '@mui/icons-material/Groups';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import MenuIcon from '@mui/icons-material/Menu';
@@ -24,6 +25,7 @@ const adminNav = [
   { href: '/admin/users', label: 'Manage Users', Icon: PeopleIcon },
   { href: '/admin/kyc', label: 'KYC Verification', Icon: VerifiedUserIcon },
   { href: '/admin/transactions', label: 'Transactions', Icon: ReceiptLongIcon },
+  { href: '/admin/investments', label: 'Investments', Icon: AccountBalanceIcon },
   { href: '/admin/wallets', label: 'Wallets', Icon: AccountBalanceWalletIcon },
   { href: '/admin/plans', label: 'Investment Plans', Icon: GroupsIcon },
   { href: '/admin/copy-trades', label: 'Copy Trades', Icon: ContentCopyIcon },
