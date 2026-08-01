@@ -10,10 +10,11 @@ import TrendingUpIcon from '@mui/icons-material/TrendingUp';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
 import AccountBalanceWalletIcon from '@mui/icons-material/AccountBalanceWallet';
 import ShowChartIcon from '@mui/icons-material/ShowChart';
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 
 type Transaction = {
   id: string;
-  type: 'deposit' | 'withdrawal' | 'profit' | 'investment' | 'copy_trade';
+  type: 'deposit' | 'withdrawal' | 'profit' | 'investment' | 'copy_trade' | 'transfer_sent' | 'transfer_received';
   amount: number;
   status: string;
   date: any;
@@ -50,6 +51,18 @@ const TYPE_CONFIG = {
     color: '#38bdf8',
     icon: <ContentCopyIcon sx={{ fontSize: 18 }} />,
     sign: '-',
+  },
+  transfer_sent: {
+    label: 'Transfer Sent',
+    color: '#ff1744',
+    icon: <SwapHorizIcon sx={{ fontSize: 18 }} />,
+    sign: '-',
+  },
+  transfer_received: {
+    label: 'Transfer Received',
+    color: '#00e676',
+    icon: <SwapHorizIcon sx={{ fontSize: 18 }} />,
+    sign: '+',
   },
 };
 
@@ -155,6 +168,8 @@ export default function TransactionsPage() {
     { key: 'profit', label: 'Profits' },
     { key: 'investment', label: 'Investments' },
     { key: 'copy_trade', label: 'Copy Trade' },
+    { key: 'transfer_sent', label: 'Transfers Sent' },
+    { key: 'transfer_received', label: 'Transfers Received' },
   ];
 
   return (

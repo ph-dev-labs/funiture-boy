@@ -12,6 +12,7 @@ import SettingsIcon from '@mui/icons-material/Settings';
 import LogoutIcon from '@mui/icons-material/Logout';
 import CurrencyBitcoinIcon from '@mui/icons-material/CurrencyBitcoin';
 import ContentCopyIcon from '@mui/icons-material/ContentCopy';
+import SwapHorizIcon from '@mui/icons-material/SwapHoriz';
 import CloseIcon from '@mui/icons-material/Close';
 import { auth } from '@/lib/firebase';
 import { useAuthStore } from '@/store';
@@ -20,6 +21,7 @@ import { useRouter } from 'next/navigation';
 const navItems = [
   { href: '/dashboard', label: 'Overview', Icon: DashboardIcon },
   { href: '/dashboard/deposit', label: 'Deposit', Icon: AccountBalanceWalletIcon },
+  { href: '/dashboard/transfer', label: 'Transfer', Icon: SwapHorizIcon },
   { href: '/dashboard/invest', label: 'Investment Plans', Icon: GroupsIcon },
   { href: '/dashboard/copy-trade', label: 'Copy Trading', Icon: ContentCopyIcon },
   { href: '/dashboard/transactions', label: 'Transactions', Icon: HistoryIcon },

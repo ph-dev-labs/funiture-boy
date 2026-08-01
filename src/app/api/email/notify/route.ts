@@ -16,12 +16,14 @@ export async function POST(req: NextRequest) {
       withdrawal_approved: '✅ Withdrawal Processed — TrendyTrades',
       withdrawal_rejected: '❌ Withdrawal Rejected — TrendyTrades',
       profit_credited: '📈 Profit Credited — TrendyTrades',
+      transfer_received: '💸 Funds Received — TrendyTrades',
     };
 
     const colors: Record<string, string> = {
       deposit_approved: '#00e676',
       withdrawal_approved: '#00e676',
       profit_credited: '#00e676',
+      transfer_received: '#00e676',
       deposit_rejected: '#ff1744',
       withdrawal_rejected: '#ff1744',
       deposit_received: '#d4af37',
