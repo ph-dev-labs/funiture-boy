@@ -102,7 +102,9 @@ export default function TransactionsPage() {
           amount: data.amount,
           status: data.status,
           date: data.createdAt,
-          description: `Withdrawal to ${data.network || 'wallet'}`,
+          description: data.method === 'bank'
+            ? `Withdrawal to ${data.bankName || 'bank account'}`
+            : `Withdrawal to ${data.network || 'wallet'}`,
         });
       });
 

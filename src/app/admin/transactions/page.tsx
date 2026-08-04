@@ -17,6 +17,11 @@ type TxData = {
   network?: string;
   txHash?: string;
   address?: string;
+  method?: 'crypto' | 'bank';
+  bankName?: string;
+  accountName?: string;
+  accountNumber?: string;
+  routingCode?: string;
   status: 'pending' | 'approved' | 'rejected';
   createdAt: any;
   _type: 'deposit' | 'withdrawal';
@@ -193,7 +198,7 @@ export default function AdminTransactionsPage() {
                   <th className="p-4 text-xs font-semibold text-white/60 uppercase tracking-wider">TxHash</th>
                 )}
                 {activeTab === 'withdrawal' && (
-                  <th className="p-4 text-xs font-semibold text-white/60 uppercase tracking-wider">Address / Network</th>
+                  <th className="p-4 text-xs font-semibold text-white/60 uppercase tracking-wider">Destination</th>
                 )}
                 <th className="p-4 text-xs font-semibold text-white/60 uppercase tracking-wider">Date</th>
                 <th className="p-4 text-xs font-semibold text-white/60 uppercase tracking-wider">Status</th>
@@ -227,8 +232,20 @@ export default function AdminTransactionsPage() {
                       )}
                       {activeTab === 'withdrawal' && (
                         <td className="p-4">
-                          <div className="text-xs font-mono text-white/70 max-w-[160px] truncate">{t.address}</div>
-                          <div className="text-xs text-white/40 mt-0.5">{t.network}</div>
+                          {t.method === 'bank' ? (
+                            <>
+                              <div className="text-xs font-medium text-white/70">{t.bankName}</div>
+                              <div className="text-xs text-white/40 mt-0.5">{t.accountName}</div>
+                              <div className="text-xs font-mono text-white/40 mt-0.5">
+                                {t.accountNumber} · {t.routingCode}
+                              </div>
+                            </>
+                          ) : (
+                            <>
+                              <div className="text-xs font-mono text-white/70 max-w-[160px] truncate">{t.address}</div>
+                              <div className="text-xs text-white/40 mt-0.5">{t.network}</div>
+                            </>
+                          )}
                         </td>
                       )}
                       <td className="p-4 text-xs text-white/40">
